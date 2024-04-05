@@ -18,7 +18,7 @@ python /pfs/work7/workspace/scratch/tu_zxmav84-thesis/Thesis/stylegan2-ada-pytor
     --snap 10 \
     --resume ffhq512 \
     --outdir /pfs/work7/workspace/scratch/tu_zxmav84-thesis/Data.nosync/Models/Stylegan2_Ada/Experiments \
-    --data /pfs/work7/workspace/scratch/tu_zxmav84-thesis/Data.nosync/Zalando_Dataset/dresses/images/stylegan2_ada_images \
+    --data /pfs/work7/workspace/scratch/tu_zxmav84-thesis/Data.nosync/Zalando_Germany_Dataset/dresses/images/stylegan2_ada_images \
     --kimg=1000 \
     --gpus=2 \
     --cfg=auto \
