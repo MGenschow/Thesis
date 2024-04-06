@@ -4,7 +4,7 @@
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=4
 #SBATCH --gres=gpu:2
-#SBATCH --mem=16000
+#SBATCH --mem=14000
 #SBATCH --time=12:00:00
 #SBATCH --mail-user=malte.genschow@student.uni-tuebingen.de
 #SBATCH --mail-type=BEGIN,END,FAIL
