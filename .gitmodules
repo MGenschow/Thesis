@@ -1,6 +1,9 @@
 [submodule "stylegan2-ada-pytorch"]
 	path = stylegan2-ada-pytorch
 	url = https://github.com/MGenschow/stylegan2-ada-pytorch.git
+[submodule "encoder4editing"]
+	path = encoder4editing
+	url = https://github.com/MGenschow/encoder4editing.git
 [submodule "PTI"]
 	path = PTI
 	url = https://github.com/MGenschow/PTI.git
