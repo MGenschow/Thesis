@@ -4,3 +4,6 @@
 [submodule "encoder4editing"]
 	path = encoder4editing
 	url = https://github.com/MGenschow/encoder4editing.git
+[submodule "PTI"]
+	path = PTI
+	url = https://github.com/MGenschow/PTI.git
