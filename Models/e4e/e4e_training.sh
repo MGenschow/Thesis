@@ -18,7 +18,7 @@ conda activate thesis
 cd /pfs/work7/workspace/scratch/tu_zxmav84-thesis/Thesis/encoder4editing/
 
 python scripts/train.py \
-    --exp_dir=/pfs/work7/workspace/scratch/tu_zxmav84-thesis/Data.nosync/Models/e4e/experiments/ \
+    --exp_dir=/pfs/work7/workspace/scratch/tu_zxmav84-thesis/Data.nosync/Models/e4e/experiments_default_lr/ \
     --sub_exp_dir=setup \
     --dataset_type zalando_germany_encode \
     --workers 8 \
@@ -27,7 +27,7 @@ python scripts/train.py \
     --test_workers 4 \
     --stylegan_weights /pfs/work7/workspace/scratch/tu_zxmav84-thesis/Data.nosync/Models/e4e/pretrained/stylegan2_ada_zalando_germany.pt \
     --stylegan_size 512 \
-    --learning_rate=0.001 \
+    --learning_rate=0.0001 \
     --start_from_latent_avg \
     --use_w_pool \
     --w_discriminator_lambda 0.1 \
