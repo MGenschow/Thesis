@@ -10,3 +10,6 @@
 [submodule "stylegan2-pytorch"]
 	path = stylegan2-pytorch
 	url = https://github.com/MGenschow/stylegan2-pytorch.git
+[submodule "hyperstyle"]
+	path = hyperstyle
+	url = https://github.com/MGenschow/hyperstyle.git
