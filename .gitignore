@@ -158,3 +158,4 @@ cython_debug/
 *.out
 apify_token.py
 *.csv
+*wandb
