@@ -23,6 +23,7 @@ elif platform.system() == 'Linux':
 # %%
 # Import Metadata
 df = pd.read_json(f"{DATA_PATH}/Zalando_Germany_Dataset/dresses/metadata/dresses_metadata.json").T.reset_index().rename(columns={'index': 'sku'})[['sku', 'garment_type']]
+df = df.sample(1000)
 # Create id2label and label2id mappings
 id2label = {i:elem for i,elem in enumerate(df.garment_type.value_counts().index)}
 label2id = {elem:i for i,elem in enumerate(df.garment_type.value_counts().index)}
