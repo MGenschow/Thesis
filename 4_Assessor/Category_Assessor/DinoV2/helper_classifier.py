@@ -10,13 +10,33 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 import torch.optim as optim
 import wandb
+import numpy as np
+import random
+from sklearn.utils import check_random_state
+
 
 from helper_DinoV2_Embeddings import extract_embeddings, set_device
+
+def set_seed(seed):
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+
+    np.random.seed(seed)
+    random.seed(seed)
+    check_random_state(seed)
+
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
 
 # %%
 def prepare_data(df, target_feature):
     df = df[['sku', target_feature]].copy()
+
+    # Drop rows with missing values
+    df = df[df[target_feature].notna()]
+
     # Create id2label and label2id mappings
     id2label = {i:elem for i,elem in enumerate(df[target_feature].value_counts().index)}
     label2id = {elem:i for i,elem in enumerate(df[target_feature].value_counts().index)}
@@ -122,10 +142,12 @@ def train_model(model, NUM_EPOCHS, BATCH_SIZE, optimizer, loss_fn, train_dataset
 
 
 #################### Weights and Biases Tuning ####################
-def train_wb(model, train_dataset, test_dataset, device):
+def train_wb(model_input_dim, model_output_dim, train_dataset, test_dataset, device):
+    set_seed(42)
     wandb.init()
 
     config = wandb.config
+    model = ClassifierModel(model_input_dim, model_output_dim)
     model = model.to(device)
     loss_fn = nn.CrossEntropyLoss()
     optimizer = get_optimizer(model, config)
