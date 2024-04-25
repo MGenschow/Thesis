@@ -17,8 +17,10 @@ from torch.nn.functional import softmax
 import platform
 if platform.system() == 'Darwin':
     DATA_PATH = "/Users/maltegenschow/Documents/Uni/Thesis/Data.nosync"
+    ROOT_PATH = "/Users/maltegenschow/Documents/Uni/Thesis/Thesis"
 elif platform.system() == 'Linux':
     DATA_PATH = "/pfs/work7/workspace/scratch/tu_zxmav84-thesis/Data.nosync"
+    ROOT_PATH = "/pfs/work7/workspace/scratch/tu_zxmav84-thesis/Thesis"
 
 # %%
 def set_device():
