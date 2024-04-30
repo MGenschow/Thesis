@@ -26,21 +26,20 @@ elif platform.system() == 'Linux':
 # %%
 def set_device():
     if torch.cuda.is_available():
+        dino_device = torch.device('cuda')
+        sg2_device = torch.device('cuda')
         device = torch.device('cuda')
     elif torch.backends.mps.is_available():
+        dino_device = torch.device('cpu')
+        sg2_device = torch.device('mps')
         device = torch.device('mps')
     else:
+        dino_device = torch.device('cpu')
+        sg2_device = torch.device('cpu')
         device = torch.device('cpu')
-    print(f"Using device: {device}")
-    return device
+    print(f"Using devices: DinoV2 device: {dino_device} | SG2 device: {sg2_device} | General device: {device}")
+    return dino_device, sg2_device, device
 
-def set_dino_device():
-    if torch.cuda.is_available():
-        device = torch.device('cuda')
-    else:
-        device = torch.device('cpu')
-    print(f"Using dino device: {device}")
-    return device
 # %%
 # Setup DinoV2 Custom Processor to ensure gradient flow in later training
 transform_pipeline = transforms.Compose([
@@ -72,10 +71,10 @@ def extract_embeddings():
         print('Calculating embeddings from DINOV2 model...')
 
         model_name = "facebook/dinov2-base"
-        device = set_dino_device()
+        dino_device, sg2_device, device = set_dino_device()
         processor = dino_processor
         model = AutoModel.from_pretrained(model_name)
-        model = model.to(device)
+        model = model.to(dino_device)
 
 
         embeddings = torch.zeros(df.shape[0], 768)
@@ -86,7 +85,7 @@ def extract_embeddings():
             # Load Image and preprocess
             img_path = f"{root_path}{sku}.jpg"
             input = processor(img_path)
-            input = input.to(device)
+            input = input.to(dino_device)
             # Perform forward pass
             with torch.no_grad():
                 output = model(input)
@@ -104,11 +103,5 @@ def extract_embeddings():
         print(f'{embeddings.shape[0]} embeddings loaded from disk...')
     
     return embeddings, df
-
-# %%
-
-
-# %%
-
 
 

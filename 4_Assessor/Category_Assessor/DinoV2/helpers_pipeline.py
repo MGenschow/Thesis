@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from transformers import AutoImageProcessor, AutoModel
 import numpy as np
 from helper_classifier import ClassifierModel
+from helper_DinoV2_Embeddings import *
 
 
 set_seed(42)
@@ -26,18 +27,7 @@ elif platform.system() == 'Linux':
 
 current_wd = os.getcwd()
 
-# %%
-def set_device():
-    if torch.cuda.is_available():
-        device = torch.device('cuda')
-    elif torch.backends.mps.is_available():
-        device = torch.device('mps')
-    else:
-        device = torch.device('cpu')
-    print(f"Using device: {device}")
-    return device
-
-device = set_device()
+dino_device, sg2_device, device = set_device()
 
 # %% [markdown]
 # ### Metadata
@@ -56,7 +46,7 @@ def load_latents(target_feature='category'):
     # Drop rows with missing values
     df = df[df[target_feature].notna()]
 
-    latents = torch.load(f"{DATA_PATH}/Models/e4e/experiments_default_lr/inversions/latents.pt").to(device)
+    latents = torch.load(f"{DATA_PATH}/Models/e4e/experiments_default_lr/inversions/latents.pt")
     file_paths = pickle.load(open(f"{DATA_PATH}/Models/e4e/experiments_default_lr/inversions/file_paths.pkl", 'rb'))
     sku_ordering = [elem.split('/')[-1].split('.')[0] for elem in file_paths]
     df['latent_idx'] = df.sku.map(lambda x: sku_ordering.index(x) if x in sku_ordering else None)
@@ -77,7 +67,6 @@ def setup_generator():
         architecture = pickle.load(f)
         G = architecture['G_ema']
         D = architecture['D']
-    G = G.to(device)
     os.chdir(current_wd)
     return G
 
@@ -87,20 +76,17 @@ def setup_generator():
 # %%
 def setup_dinov2():
     model_name = "facebook/dinov2-base"
-    processor = AutoImageProcessor.from_pretrained(model_name)
+    processor = dino_processor
     model = AutoModel.from_pretrained(model_name)
-    dino_device = 'cuda' if torch.cuda.is_available() else 'cpu' #Model does not work on MPS, therefore, only assign cuda, else CPU
-    model = model.to(dino_device)
 
     return processor, model
 
 # %%
-def get_dinov2_embedding(model, processor, img:Image):
-    inputs = processor(images=img, return_tensors="pt")
-    dino_device = 'cuda' if torch.cuda.is_available() else 'cpu'  #Model does not work on MPS, therefore, only assign cuda, else CPU
-    inputs = inputs.to(dino_device)
+def get_dinov2_embedding(model, processor, img):
+    inputs = processor(img)
+    inputs = inputs.to(model.device)
     with torch.no_grad():
-        output = model(**inputs)
+        output = model(inputs)
         embedding = output['pooler_output']
     return embedding
 
@@ -110,14 +96,13 @@ def get_dinov2_embedding(model, processor, img:Image):
 # %%
 def load_classifier():
     classifier = torch.load(f"{DATA_PATH}/Models/Assessor/DinoV2/Classifier/dinov2_category_classifier.pt")
-    classifier = classifier.to(device)
     return classifier
 
 # %% [markdown]
 # ### Whole Attribute Score Pipeline
 
 # %%
-def get_attribute_scores(dino_model, dino_processor, classifier, img:Image):
+def get_attribute_scores(dino_model, dino_processor, classifier, img):
     embedding = get_dinov2_embedding(dino_model, dino_processor, img)
     embedding = embedding.to(device)
     scores = classifier(embedding)
