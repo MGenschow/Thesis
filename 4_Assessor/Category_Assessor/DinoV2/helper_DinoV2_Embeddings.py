@@ -12,6 +12,7 @@ from torch.utils.data import Dataset, DataLoader
 import torch.nn as nn
 import matplotlib.pyplot as plt
 from torch.nn.functional import softmax
+import torchvision.transforms as transforms
 
 # %%
 import platform
@@ -32,9 +33,33 @@ def set_device():
         device = torch.device('cpu')
     print(f"Using device: {device}")
     return device
-# %%
-# Load in Model
 
+def set_dino_device():
+    if torch.cuda.is_available():
+        device = torch.device('cuda')
+    else:
+        device = torch.device('cpu')
+    print(f"Using dino device: {device}")
+    return device
+# %%
+# Setup DinoV2 Custom Processor to ensure gradient flow in later training
+transform_pipeline = transforms.Compose([
+    #transforms.Resize(256),  # Resize so the shortest side is 256
+    #transforms.CenterCrop((224, 224)),  # Center crop to 224x224
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # Normalize
+])
+def dino_processor(input):
+    if isinstance(input, str):
+        img = Image.open(input).convert('RGB')
+        img = transforms.ToTensor()(img.resize([512,512]))
+        img = img.unsqueeze(0)
+
+        processed_img = transform_pipeline(img)
+    elif isinstance(input, torch.Tensor):
+        processed_img = transform_pipeline(input)
+    else:
+        raise ValueError("Input must be either a string or a torch.Tensor")
+    return processed_img
 
 # %%
 # Extract all embeddings
@@ -47,8 +72,8 @@ def extract_embeddings():
         print('Calculating embeddings from DINOV2 model...')
 
         model_name = "facebook/dinov2-base"
-        device = set_device()
-        processor = AutoImageProcessor.from_pretrained(model_name)
+        device = set_dino_device()
+        processor = dino_processor
         model = AutoModel.from_pretrained(model_name)
         model = model.to(device)
 
@@ -60,12 +85,11 @@ def extract_embeddings():
             sku = row[1]['sku']
             # Load Image and preprocess
             img_path = f"{root_path}{sku}.jpg"
-            img = Image.open(img_path).convert('RGB')
-            input = processor(img, return_tensors="pt")
+            input = processor(img_path)
             input = input.to(device)
             # Perform forward pass
             with torch.no_grad():
-                output = model(**input)
+                output = model(input)
                 embedding = output['pooler_output']
             # Assign embedding to embeddings
             embeddings[index,:] = embedding

@@ -77,7 +77,7 @@ def setup_generator():
         architecture = pickle.load(f)
         G = architecture['G_ema']
         D = architecture['D']
-
+    G = G.to(device)
     os.chdir(current_wd)
     return G
 
@@ -110,6 +110,7 @@ def get_dinov2_embedding(model, processor, img:Image):
 # %%
 def load_classifier():
     classifier = torch.load(f"{DATA_PATH}/Models/Assessor/DinoV2/Classifier/dinov2_category_classifier.pt")
+    classifier = classifier.to(device)
     return classifier
 
 # %% [markdown]
