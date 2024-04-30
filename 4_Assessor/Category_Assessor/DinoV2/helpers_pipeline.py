@@ -95,7 +95,7 @@ def get_dinov2_embedding(model, processor, img):
 
 # %%
 def load_classifier():
-    classifier = torch.load(f"{DATA_PATH}/Models/Assessor/DinoV2/Classifier/dinov2_category_classifier.pt")
+    classifier = torch.load(f"{DATA_PATH}/Models/Assessor/DinoV2/Classifier/dinov2_category_classifier.pt", map_location=torch.device('cpu'))
     return classifier
 
 # %% [markdown]
