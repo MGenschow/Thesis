@@ -71,7 +71,7 @@ def extract_embeddings():
         print('Calculating embeddings from DINOV2 model...')
 
         model_name = "facebook/dinov2-base"
-        dino_device, sg2_device, device = set_dino_device()
+        dino_device, sg2_device, device = set_device()
         processor = dino_processor
         model = AutoModel.from_pretrained(model_name)
         model = model.to(dino_device)
@@ -103,5 +103,47 @@ def extract_embeddings():
         print(f'{embeddings.shape[0]} embeddings loaded from disk...')
     
     return embeddings, df
+
+def extract_generated_embeddings():
+        df = pd.read_json(f"{DATA_PATH}/Zalando_Germany_Dataset/dresses/metadata/dresses_metadata.json").T.reset_index().rename(columns={'index': 'sku'})
+        save_path = f"{DATA_PATH}/Models/Assessor/DinoV2/Embeddings/dinov2_generated_embeddings.pt"
+        root_path = f"{DATA_PATH}/Generated_Images/Zalando_Germany_Reconstructions/"
+
+        if not os.path.exists(save_path):
+            print('Calculating embeddings from DINOV2 model...')
+
+            model_name = "facebook/dinov2-base"
+            dino_device, sg2_device, device = set_device()
+            processor = dino_processor
+            model = AutoModel.from_pretrained(model_name)
+            model = model.to(dino_device)
+
+
+            embeddings = torch.zeros(df.shape[0], 768)
+
+            for row in tqdm(df.iterrows(), total=df.shape[0]):
+                index = row[0]
+                sku = row[1]['sku']
+                # Load Image and preprocess
+                img_path = f"{root_path}{sku}.jpg"
+                input = processor(img_path)
+                input = input.to(dino_device)
+                # Perform forward pass
+                with torch.no_grad():
+                    output = model(input)
+                    embedding = output['pooler_output']
+                # Assign embedding to embeddings
+                embeddings[index,:] = embedding
+
+
+            # Save embeddings to disc
+            torch.save(embeddings, save_path)
+            print('Embeddings saved to disk...')
+        else: 
+            print('Loading embeddings from disk...')
+            embeddings = torch.load(save_path)
+            print(f'{embeddings.shape[0]} embeddings loaded from disk...')
+        
+        return embeddings, df
 
 
