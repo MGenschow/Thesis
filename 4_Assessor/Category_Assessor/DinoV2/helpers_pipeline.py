@@ -30,10 +30,6 @@ current_wd = os.getcwd()
 dino_device, sg2_device, device = set_device()
 
 # %% [markdown]
-# ### Metadata
-
-# %%
-target_feature = "category"
 
 # %% [markdown]
 # ### Latents
@@ -94,8 +90,8 @@ def get_dinov2_embedding(model, processor, img):
 # ### Load Attribute Classifier
 
 # %%
-def load_classifier():
-    classifier = torch.load(f"{DATA_PATH}/Models/Assessor/DinoV2/Classifier/dinov2_category_classifier.pt", map_location=torch.device('cpu'))
+def load_classifier(path):
+    classifier = torch.load(path, map_location=torch.device('cpu'))
     return classifier
 
 # %% [markdown]
