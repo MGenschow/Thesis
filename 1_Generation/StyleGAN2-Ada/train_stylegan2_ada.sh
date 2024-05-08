@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --gres=gpu:2
 #SBATCH --mem=14000
-#SBATCH --time=12:00:00
+#SBATCH --time=26:00:00
 #SBATCH --mail-user=malte.genschow@student.uni-tuebingen.de
 #SBATCH --mail-type=BEGIN,END,FAIL
 
@@ -19,7 +19,7 @@ python /pfs/work7/workspace/scratch/tu_zxmav84-thesis/Thesis/stylegan2-ada-pytor
     --resume ffhq512 \
     --outdir /pfs/work7/workspace/scratch/tu_zxmav84-thesis/Data.nosync/Models/Stylegan2_Ada/Experiments \
     --data /pfs/work7/workspace/scratch/tu_zxmav84-thesis/Data.nosync/Zalando_Germany_Dataset/dresses/images/stylegan2_ada_images \
-    --kimg=1000 \
+    --kimg=5000 \
     --gpus=2 \
     --cfg=auto \
     --mirror=1 \
