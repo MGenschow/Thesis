@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --gres=gpu:1
 #SBATCH --mem=6000
-#SBATCH --time=08:00:00
+#SBATCH --time=12:30:00
 #SBATCH --mail-user=malte.genschow@student.uni-tuebingen.de
 #SBATCH --mail-type=BEGIN,END,FAIL
 
@@ -18,7 +18,7 @@ conda activate thesis
 cd /pfs/work7/workspace/scratch/tu_zxmav84-thesis/Thesis/encoder4editing/
 
 python scripts/train.py \
-    --exp_dir=/pfs/work7/workspace/scratch/tu_zxmav84-thesis/Data.nosync/Models/e4e/experiments_default_lr/ \
+    --exp_dir=/pfs/work7/workspace/scratch/tu_zxmav84-thesis/Data.nosync/Models/e4e/experiments_default_lr_resume/ \
     --sub_exp_dir=setup \
     --dataset_type zalando_germany_encode \
     --workers 8 \
@@ -37,4 +37,5 @@ python scripts/train.py \
     --save_interval 2000 \
     --val_interval 2000 \
     --image_interval 500 \
-    --save_training_data
+    --save_training_data \
+    --resume_training_from_ckpt "/pfs/work7/workspace/scratch/tu_zxmav84-thesis/Data.nosync/Models/e4e/experiments_default_lr/checkpoints/iteration_40000.pt"
