@@ -1,0 +1,16 @@
+#!/bin/bash
+
+#SBATCH --partition=gpu_4
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=4
+#SBATCH --gres=gpu:2
+#SBATCH --mem=14000
+#SBATCH --time=03:00:00
+#SBATCH --mail-user=malte.genschow@student.uni-tuebingen.de
+#SBATCH --mail-type=BEGIN,END,FAIL
+
+module load devel/cuda/11.0
+export CXX=g++
+source /pfs/work7/workspace/scratch/tu_zxmav84-thesis/miniconda3/etc/profile.d/conda.sh
+conda activate thesis
+python run_evaluation.py
