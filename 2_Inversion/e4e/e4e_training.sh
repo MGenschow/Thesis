@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --gres=gpu:1
 #SBATCH --mem=6000
-#SBATCH --time=12:30:00
+#SBATCH --time=12:00:00
 #SBATCH --mail-user=malte.genschow@student.uni-tuebingen.de
 #SBATCH --mail-type=BEGIN,END,FAIL
 
@@ -18,14 +18,14 @@ conda activate thesis
 cd /pfs/work7/workspace/scratch/tu_zxmav84-thesis/Thesis/encoder4editing/
 
 python scripts/train.py \
-    --exp_dir=/pfs/work7/workspace/scratch/tu_zxmav84-thesis/Data.nosync/Models/e4e/experiments_default_lr_resume/ \
+    --exp_dir=/pfs/work7/workspace/scratch/tu_zxmav84-thesis/Data.nosync/Models/e4e/00005_snapshot_1200/ \
     --sub_exp_dir=setup \
     --dataset_type zalando_germany_encode \
     --workers 8 \
     --batch_size 8 \
     --test_batch_size 4 \
     --test_workers 4 \
-    --stylegan_weights /pfs/work7/workspace/scratch/tu_zxmav84-thesis/Data.nosync/Models/e4e/pretrained/stylegan2_ada_zalando_germany.pt \
+    --stylegan_weights /pfs/work7/workspace/scratch/tu_zxmav84-thesis/Data.nosync/Models/e4e/pretrained/00005-stylegan2_ada_images-mirror-auto2-kimg5000-resumeffhq512_network-snapshot-001200.pt \
     --stylegan_size 512 \
     --learning_rate=0.0001 \
     --start_from_latent_avg \
@@ -38,4 +38,4 @@ python scripts/train.py \
     --val_interval 2000 \
     --image_interval 500 \
     --save_training_data \
-    --resume_training_from_ckpt "/pfs/work7/workspace/scratch/tu_zxmav84-thesis/Data.nosync/Models/e4e/experiments_default_lr/checkpoints/iteration_40000.pt"
+    #--resume_training_from_ckpt "/pfs/work7/workspace/scratch/tu_zxmav84-thesis/Data.nosync/Models/e4e/experiments_default_lr/checkpoints/iteration_40000.pt"
