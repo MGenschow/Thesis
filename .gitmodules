@@ -13,3 +13,6 @@
 [submodule "hyperstyle"]
 	path = hyperstyle
 	url = https://github.com/MGenschow/hyperstyle.git
+[submodule "restyle-encoder"]
+	path = restyle-encoder
+	url = https://github.com/MGenschow/restyle-encoder.git
