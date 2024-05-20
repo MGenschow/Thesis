@@ -22,7 +22,7 @@ if platform.system() == 'Darwin':
 elif platform.system() == 'Linux':
     DATA_PATH = "/pfs/work7/workspace/scratch/tu_zxmav84-thesis/Data.nosync"
     ROOT_PATH = "/pfs/work7/workspace/scratch/tu_zxmav84-thesis/Thesis"
-
+ 
 # %%
 def set_device():
     if torch.cuda.is_available():
