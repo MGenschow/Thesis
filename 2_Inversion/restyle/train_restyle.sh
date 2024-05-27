@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --gres=gpu:1
 #SBATCH --mem=6000
-#SBATCH --time=35:00:00
+#SBATCH --time=20:00:00
 #SBATCH --mail-user=malte.genschow@student.uni-tuebingen.de
 #SBATCH --mail-type=BEGIN,END,FAIL
 
@@ -40,5 +40,5 @@ python scripts/train_restyle_e4e.py \
     --n_iters_per_batch=5 \
     --output_size=512 \
     --save_training_data \
-    --checkpoint_path=/pfs/work7/workspace/scratch/tu_zxmav84-thesis/Data.nosync/Models/restyle/00005_snapshot_1200/checkpoints/iteration_26000.pt \
-    --resume_training_from_ckpt=/pfs/work7/workspace/scratch/tu_zxmav84-thesis/Data.nosync/Models/restyle/00005_snapshot_1200/checkpoints/iteration_26000.pt
+    --checkpoint_path=/pfs/work7/workspace/scratch/tu_zxmav84-thesis/Data.nosync/Models/restyle/00005_snapshot_1200/checkpoints/iteration_70000.pt \
+    --resume_training_from_ckpt=/pfs/work7/workspace/scratch/tu_zxmav84-thesis/Data.nosync/Models/restyle/00005_snapshot_1200/checkpoints/iteration_70000.pt
