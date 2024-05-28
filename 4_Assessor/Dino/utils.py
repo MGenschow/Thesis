@@ -1,4 +1,5 @@
 # %%
+from transformers import AutoImageProcessor, AutoModel
 import torch
 from torch.utils.data import Dataset, DataLoader, random_split, ConcatDataset
 from tqdm import tqdm
@@ -7,6 +8,8 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 import torch.nn as nn
 import matplotlib.pyplot as plt
+from torchvision import transforms
+from PIL import Image
 
 # %%
 import pickle
@@ -20,6 +23,8 @@ elif platform.system() == 'Linux':
     ROOT_PATH = "/pfs/work7/workspace/scratch/tu_zxmav84-thesis/Thesis"
 
 current_wd = os.getcwd()
+
+############################ Torch Definitions ############################
 
 torch.manual_seed(42)
 
@@ -40,6 +45,59 @@ def set_device():
     print(f"Using {device} as device")
     return device
 
+############################ DinoV2 Functions ############################
+
+def dino_processor(input):
+    transform_pipeline = transforms.Compose([
+        #transforms.Resize(256),  # Resize so the shortest side is 256
+        #transforms.CenterCrop((224, 224)),  # Center crop to 224x224
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # Normalize
+    ])
+    if isinstance(input, str):
+        img = Image.open(input).convert('RGB')
+        img = transforms.ToTensor()(img.resize([512,512]))
+        img = img.unsqueeze(0)
+        processed_img = transform_pipeline(img)
+        
+    elif isinstance(input, torch.Tensor):
+        processed_img = transform_pipeline(input)
+    else:
+        raise ValueError("Input must be either a string or a torch.Tensor")
+    return processed_img
+
+def setup_dino_model(device):
+    model_name = "facebook/dinov2-base"
+    model = AutoModel.from_pretrained(model_name)
+    model = model.to(device)
+    return model
+
+def calculate_embeddings(input_images_path, save_path):
+    if os.path.exists(save_path):
+        print(f"Embeddings for {input_images_path} already calculated")
+        return
+    
+    input_images = glob(f"{input_images_path}*.jpg")
+    skus = [elem.split('/')[-1].split('.')[0] for elem in input_images]
+
+    embeddings = {elem:None for elem in skus}
+
+    for image_path in tqdm(input_images):
+        sku = image_path.split('/')[-1].split('.')[0]
+        # Load Image and preprocess
+        input = dino_processor(image_path)
+        input = input.to(device)
+        # Perform forward pass
+        with torch.no_grad():
+            output = dino_model(input)
+            embedding = output['pooler_output']
+        # Assign embedding to embeddings
+        embeddings[sku] = embedding.detach().cpu()
+    
+    # Save embeddings
+    torch.save(embeddings, save_path)
+
+
+############################ Classifier Data Prep Functions ############################
 # %%
 def get_datasets(target):
     df = pd.read_json(f"{DATA_PATH}/Zalando_Germany_Dataset/dresses/metadata/dresses_metadata.json").T.reset_index().rename(columns={'index': 'sku'})
@@ -106,21 +164,7 @@ def prepare_data(target, embeddings_name):
     return train, test
 
 
-class ClassifierModel(nn.Module):
-    def __init__(self, input_dim, output_dim):
-        super(ClassifierModel, self).__init__()
-        self.layer_stack = nn.Sequential(
-            nn.Linear(input_dim, 512),
-            nn.ReLU(),
-            nn.Linear(512, 256),
-            nn.ReLU(),
-            nn.Linear(256, output_dim)
-        )
-
-    def forward(self, x):
-        x = self.layer_stack(x)
-        return x
-
+############################ Classifier Train Functions ############################
 class ClassifierModel(nn.Module):
     def __init__(self, input_dim, output_dim):
         super(ClassifierModel, self).__init__()
@@ -150,35 +194,6 @@ def evaluate_model(model, loader, device):
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
     return correct / total
-
-def train_model(model, NUM_EPOCHS, optimizer, loss_fn, train_loader, test_loader, save_path, device, log_every=1):
-
-    initial_test_acc = evaluate_model(model, test_loader, device)
-    initial_train_acc = evaluate_model(model, train_loader, device)
-    print(f"Initial Train Accuracy: {initial_train_acc}, Initial Test Accuracy: {initial_test_acc}")
-    for epoch in range(NUM_EPOCHS):
-        model.train()
-        i = 0
-        for embeddings, labels, sku in train_loader:
-            optimizer.zero_grad()
-            outputs = model(embeddings.to(device))
-            loss = loss_fn(outputs, labels.to(device))
-            loss.backward()
-            optimizer.step()
-            i += 1
-            if i % log_every == 0:
-                print(f"Epoch {epoch+1}/{NUM_EPOCHS}, Batch {i}/{len(train_loader)}, Loss: {loss.item()}")
-
-        # Training Set accuracy
-        train_acc = evaluate_model(model, train_loader, device)
-
-        # Test Set accuracy
-        test_acc = evaluate_model(model, test_loader, device)
-
-        print(f"Epoch {epoch+1}/{NUM_EPOCHS}, Loss: {loss.item()}, Train Accuracy: {train_acc}, Test Accuracy: {test_acc}")
-
-    #torch.save(model, f"{save_path}")
-
 
 
 def train_model(model, NUM_EPOCHS, optimizer, loss_fn, train_loader, test_loader, save_path, device, log_every=1):
