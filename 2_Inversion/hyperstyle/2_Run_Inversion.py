@@ -122,4 +122,4 @@ with open(stats_path, 'w') as f:
     f.write(result_str)
 
 # save all latents as npy file
-np.save(os.path.join(test_opts.exp_dir, 'latents.npy'), all_latents)
+np.save(os.path.join(exp_dir, 'latents.npy'), all_latents)
