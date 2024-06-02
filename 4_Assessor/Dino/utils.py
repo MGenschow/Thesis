@@ -1,5 +1,5 @@
 # %%
-from transformers import AutoImageProcessor, AutoModel
+#from transformers import AutoImageProcessor, AutoModel
 import torch
 from torch.utils.data import Dataset, DataLoader, random_split, ConcatDataset
 from tqdm import tqdm
@@ -55,7 +55,7 @@ def dino_processor(input):
     ])
     if isinstance(input, str):
         img = Image.open(input).convert('RGB')
-        img = transforms.ToTensor()(img.resize([512,512]))
+        img = transforms.ToTensor()(img.resize([490,490]))
         img = img.unsqueeze(0)
         processed_img = transform_pipeline(img)
         

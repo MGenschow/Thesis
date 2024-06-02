@@ -16,3 +16,6 @@
 [submodule "restyle-encoder"]
 	path = restyle-encoder
 	url = https://github.com/MGenschow/restyle-encoder.git
+[submodule "dinov2"]
+	path = dinov2
+	url = https://github.com/MGenschow/dinov2.git
