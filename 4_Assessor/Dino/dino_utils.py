@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from torchvision import transforms
 from PIL import Image
 
+
 # %%
 import pickle
 import platform
@@ -23,6 +24,12 @@ elif platform.system() == 'Linux':
     ROOT_PATH = "/pfs/work7/workspace/scratch/tu_zxmav84-thesis/Thesis"
 
 current_wd = os.getcwd()
+
+
+####### Import Hyperstyle Utils
+os.chdir(f'{ROOT_PATH}/2_Inversion/hyperstyle/')
+from hyperstyle_utils import load_hyperstyle, load_generator_inputs, generate_hyperstyle
+os.chdir(f"{current_wd}")
 
 ############################ Torch Definitions ############################
 
@@ -45,11 +52,13 @@ def set_device():
     print(f"Using {device} as device")
     return device
 
+device = set_device()
+
 ############################ DinoV2 Functions ############################
 
 def dino_processor(input):
     transform_pipeline = transforms.Compose([
-        #transforms.Resize(256),  # Resize so the shortest side is 256
+        transforms.Resize(490), 
         #transforms.CenterCrop((224, 224)),  # Center crop to 224x224
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # Normalize
     ])
@@ -65,34 +74,72 @@ def dino_processor(input):
         raise ValueError("Input must be either a string or a torch.Tensor")
     return processed_img
 
+
 def setup_dino_model(device):
-    model_name = "facebook/dinov2-base"
-    model = AutoModel.from_pretrained(model_name)
+    os.chdir(f"{ROOT_PATH}/dinov2/")
+    model = torch.load(f'{DATA_PATH}/Models/DinoV2/dinov2.pt')
     model = model.to(device)
+    os.chdir(current_wd)
     return model
 
-def calculate_embeddings(input_images_path, save_path):
+dino_model = setup_dino_model(device)
+
+def get_embedding(input):
+    # Load Image and preprocess
+    input = dino_processor(input)
+    input = input.to(device)
+    # Perform forward pass
+    with torch.no_grad():
+        output = dino_model(input)
+        embedding = output
+    return embedding
+
+
+def calculate_embeddings(source, save_path, generator_type = None, generator = None):
     if os.path.exists(save_path):
-        print(f"Embeddings for {input_images_path} already calculated")
+        print(f"Embeddings for {source} already calculated")
         return
     
-    input_images = glob(f"{input_images_path}*.jpg")
-    skus = [elem.split('/')[-1].split('.')[0] for elem in input_images]
+    if isinstance(source, str):
+        input_images = glob(f"{source}*.jpg")
+        if len(input_images) == 0:
+            raise OSError('No Images found in directory')
+        skus = [elem.split('/')[-1].split('.')[0] for elem in input_images]
 
-    embeddings = {elem:None for elem in skus}
+        embeddings = {elem:None for elem in skus}
 
-    for image_path in tqdm(input_images):
-        sku = image_path.split('/')[-1].split('.')[0]
-        # Load Image and preprocess
-        input = dino_processor(image_path)
-        input = input.to(device)
-        # Perform forward pass
-        with torch.no_grad():
-            output = dino_model(input)
-            embedding = output['pooler_output']
-        # Assign embedding to embeddings
-        embeddings[sku] = embedding.detach().cpu()
-    
+        for image_path in tqdm(input_images):
+            sku = image_path.split('/')[-1].split('.')[0]
+            embedding = get_embedding(image_path)
+            embeddings[sku] = embedding.detach().cpu()
+
+    elif isinstance(source, list):
+        if generator_type == None: 
+            raise ValueError("Generator must be defined when using latents as source")
+        elif generator_type != 'hyperstyle':
+            raise NotImplementedError(f'Embeddings from generations not implemented for {generator_type}')
+        elif generator_type == 'hyperstyle':
+            
+            embeddings = {elem:None for elem in source}
+
+            hyperstyle_inference_base_path = f'{DATA_PATH}/Generated_Images/hyperstyle/'
+            latents = np.load(f"{hyperstyle_inference_base_path}latents.npy", allow_pickle=True).item()
+            for sku in tqdm(source):
+                latent, weight_delta = load_generator_inputs(sku, latents)
+                gen = generate_hyperstyle(latent, weight_delta, generator, return_image=False)
+
+                # Normalize and clamp (make if as close to saved .jpg as possible)
+                gen = ((gen + 1) / 2).clamp(0,1)
+
+                # Get dino embedding
+                embedding = get_embedding(gen)
+
+                embeddings[sku] = embedding.detach().cpu()
+
+    else:
+        raise ValueError(f"Input must be either a path (str) to an image directory or dict with latents")
+
+        
     # Save embeddings
     torch.save(embeddings, save_path)
 
