@@ -31,6 +31,12 @@ os.chdir(f'{ROOT_PATH}/2_Inversion/hyperstyle/')
 from hyperstyle_utils import load_hyperstyle, load_generator_inputs, generate_hyperstyle
 os.chdir(f"{current_wd}")
 
+
+######## Import PTI Utils 
+os.chdir(f"{ROOT_PATH}/2_Inversion/PTI/")
+from pti_utils import load_pti
+os.chdir(current_wd)
+
 ############################ Torch Definitions ############################
 
 torch.manual_seed(42)
@@ -114,9 +120,7 @@ def calculate_embeddings(source, save_path, generator_type = None, generator = N
             embeddings[sku] = embedding.detach().cpu()
 
     elif isinstance(source, list):
-        if generator_type == None: 
-            raise ValueError("Generator must be defined when using latents as source")
-        elif generator_type != 'hyperstyle':
+        if generator_type not in ['hyperstyle', 'PTI']:
             raise NotImplementedError(f'Embeddings from generations not implemented for {generator_type}')
         elif generator_type == 'hyperstyle':
             
@@ -135,6 +139,24 @@ def calculate_embeddings(source, save_path, generator_type = None, generator = N
                 embedding = get_embedding(gen)
 
                 embeddings[sku] = embedding.detach().cpu()
+        
+        elif generator_type == 'PTI':
+            
+            embeddings = {elem:None for elem in source}
+
+            for sku in tqdm(source):
+                G_PTI, latent = load_pti(sku)
+                gen = G_PTI.synthesis(latent, force_fp32=True, noise_mode='const')
+
+                # Normalize and clamp (make if as close to saved .jpg as possible)
+                gen = ((gen + 1) / 2).clamp(0,1)
+
+                # Get dino embedding
+                embedding = get_embedding(gen)
+
+                embeddings[sku] = embedding.detach().cpu()
+
+        
 
     else:
         raise ValueError(f"Input must be either a path (str) to an image directory or dict with latents")
