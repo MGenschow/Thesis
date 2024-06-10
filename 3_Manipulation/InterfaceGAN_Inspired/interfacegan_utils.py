@@ -1,3 +1,7 @@
+###### Code adapted from https://github.com/genforce/interfacegan/tree/master
+
+
+
 import os
 import sys
 import logging
@@ -96,6 +100,9 @@ def train_boundary(latent_codes, labels, split_ratio=0.7, logger=None):
     
     train_data, train_labels = latent_codes[train_idx], labels[train_idx]
     val_data, val_labels = latent_codes[val_idx], labels[val_idx]
+
+    logger.info(f'Training set size: {len(train_data)}')
+    logger.info(f'Validation set size: {len(val_data)}')
     
     # Training the SVM
     logger.info('Training SVM model...')
