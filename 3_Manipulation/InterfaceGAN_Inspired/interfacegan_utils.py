@@ -48,11 +48,10 @@ def train_svm(latent_codes, labels, split_ratio=0.7):
     if len(val_data) > 0:
         val_predictions = classifier.predict(val_data)
         accuracy = np.mean(val_labels == val_predictions)
-        print(f'Validation accuracy: {accuracy:.2f}')
     
     # Normalize and return the decision boundary
     decision_boundary = classifier.coef_.reshape(1, -1).astype(np.float32)
-    return decision_boundary / np.linalg.norm(decision_boundary)
+    return decision_boundary / np.linalg.norm(decision_boundary), accuracy
 
 def calculate_boundary(out_dir, out_name, latent_codes_path, scores_path):
     if not os.path.isfile(latent_codes_path):
@@ -63,7 +62,7 @@ def calculate_boundary(out_dir, out_name, latent_codes_path, scores_path):
         raise ValueError(f'Attribute scores `{scores_path}` does not exist!')
     scores = np.load(scores_path)
 
-    boundary = train_svm(latent_codes=latent_codes, 
-                            labels=scores)
+    boundary, accuracy = train_svm(latent_codes=latent_codes, labels=scores)
     
     np.save(os.path.join(out_dir, out_name), boundary)
+    return accuracy
