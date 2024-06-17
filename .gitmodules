@@ -19,6 +19,3 @@
 [submodule "dinov2"]
 	path = dinov2
 	url = https://github.com/MGenschow/dinov2.git
-[submodule "interfacegan"]
-	path = interfacegan
-	url = https://github.com/MGenschow/interfacegan.git
