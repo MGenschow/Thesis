@@ -19,3 +19,6 @@
 [submodule "dinov2"]
 	path = dinov2
 	url = https://github.com/MGenschow/dinov2.git
+[submodule "StyleFlow"]
+	path = StyleFlow
+	url = https://github.com/MGenschow/StyleFlow.git
