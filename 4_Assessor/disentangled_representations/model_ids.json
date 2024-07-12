@@ -1,0 +1,1 @@
+{"0": {"comment": null, "input_dim": 384, "hidden_dims_common": [256, 256], "hidden_dims_branches": [128, 128, 32], "grl_weight": null, "max_epochs": 100, "lr": 0.001, "batch_size": 256, "prediction_loss_factor": 1, "dcor_loss_factor": 0.0, "seed": 4243, "checkpoint": null, "dataset_name": "zalando_germany", "embeddings_name": "vits14"}}
