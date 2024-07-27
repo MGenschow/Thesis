@@ -209,7 +209,7 @@ def get_zalando_data(
 
     data = Zalando(
         meta_data=meta_data,
-        img_dir=f'{DATA_PATH}/Generated_Images/e4e/00005_snapshot_1200/',
+        img_dir=f'{DATA_PATH}/Generated_Images/e4e/00005_snapshot_1200_constant_noise/',
         dataset_name=dataset_name,
         transform=transforms[model][('train' if sample == 'train' else 'test_valid')]
     )

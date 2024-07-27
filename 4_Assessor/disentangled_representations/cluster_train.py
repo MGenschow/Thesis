@@ -12,19 +12,20 @@ current_wd = os.getcwd()
 
 from pipeline import train_and_validate
 
-# train_and_validate(
-#     dataset_name = 'zalando_germany',
-#     batch_size= 256,
-#     dcor_loss_factor=0,
-#     embeddings_name='vits14',
-#     grl_weight=None,
-#     hidden_dims_branches=[128, 128, 32],
-#     hidden_dims_common=[256, 256],
-#     lr=0.001,
-#     max_epochs=100,
-#     prediction_loss_factor=1,
-#     seed=4243
-# )
+train_and_validate(
+    dataset_name = 'zalando_germany',
+    batch_size= 256,
+    dcor_loss_factor=0,
+    embeddings_name='vits14',
+    grl_weight=None,
+    hidden_dims_branches=[128, 128, 32],
+    hidden_dims_common=[256, 256],
+    lr=0.001,
+    max_epochs=100,
+    prediction_loss_factor=1,
+    seed=4243, 
+    comment="embeddings from reconstructions with constant noise"
+)
 
 
 train_and_validate(
@@ -38,5 +39,6 @@ train_and_validate(
     lr=0.001,
     max_epochs=100,
     prediction_loss_factor=1,
-    seed=33
+    seed=33,
+    comment="embeddings from reconstructions with constant noise"
 )
