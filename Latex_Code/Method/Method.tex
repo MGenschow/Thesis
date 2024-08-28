@@ -1,0 +1,24 @@
+\section{Method}
+To achieve the goal of this work, the creation of a fine-grained typicality manipulation method, a modular and sequential workflow needs to be designed, which can be seen in figure \ref{fig:method_overview}. A given real image first needs to be inverted using a GAN inversion model (section \ref{sec:method_gan_inversion}) and the corresponding latent code obtained. Using a latent space manipulation technique (section \ref{sec:manipulation}), multiple new latent codes can be found that should exhibit the desired attributes. These latent codes are passed through a custom generator model and thus turned into images for which the typicality scores can be calculated using the custom typicality assessors described in section \ref{sec:typicality_measures}.
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=1\linewidth]{Thesis/Method/assets/Method_Overview-cropped.pdf}
+    \caption{Inference Workflow}
+    \label{fig:method_overview}
+\end{figure}
+In practice, the order of training the models differs from this inference workflow (see figure \ref{fig:training_pipeline}). As a first step, a generator model needs to be trained which is capable of generating images similar to the distribution of the images one wants to manipulate. This generator model is used in the second step when building an inversion model that achieves good reconstruction and editing performance. As a third step, the typicality assessor is built using the reconstructions of the real images. In the last step, the manipulation model is trained based on the typicality scores and the latent codes from the inversion step.  In the following sections, I will explain the different steps of this process in more detail and explain the methods applied in this work.
+
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=1\linewidth]{Thesis/Method/assets/training_pipeline-cropped.pdf}
+    \caption{Training Workflow}
+    \label{fig:training_pipeline}
+\end{figure}
+
+
+
+%\input{Thesis/Method/1_Dataset}
+\input{Thesis/Method/2_Generation}
+\input{Thesis/Method/3_Inversion}
+\input{Thesis/Method/4_Typicality_Measures}
+\input{Thesis/Method/5_Manipulation}
