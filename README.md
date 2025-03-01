@@ -1,4 +1,5 @@
-# Thesis
+# Disentangled Visual AttributeManipulation in Fashion: 
+## Techniques in Generative Deep Neural Networks
 
 ### Abstract:
 
