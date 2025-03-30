@@ -1,6 +1,9 @@
 # Disentangled Visual AttributeManipulation in Fashion: 
 ## Techniques in Generative Deep Neural Networks
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-ThisDressDoesNotExist-blue?style=flat-square&logo=firefox)](https://thisdressdoesnotexist.mgenschow.com)
+
+
 ### Abstract:
 
 The rapid evolution of generative adversarial networks (GANs) has significantly impacted various domains, including
@@ -16,9 +19,14 @@ InterFaceGAN method, the thesis achieves controlled latent space manipulations t
 while preserving overall image identity. Comprehensive evaluation using metrics like FID, IS, and LPIPS demonstrates the
 potential of this approach to enhance fashion design by aligning products more closely with consumer preferences.
 
+### Demo
+To showcase the fine-tuned generator model, a toy example website was built in hommage to the website based on the 
+original StyleGAN2-Ada implementation. The website can be accessed [here](https://thisdressdoesnotexist.mgenschow.com).
+
+
 ### Data
 
-Curated from Zalando’s extensive dress collection, this dataset comprises over 14,000 high-quality images of women’s
+Curated from Zalando's extensive dress collection, this dataset comprises over 14,000 high-quality images of women's
 dresses paired with rich article metadata. Only standardized, centered packshot images were retained and processed to a
 uniform 1024×1024 resolution. The metadata focuses on key attributes such as brand, price, category, fabric, fit,
 neckline, pattern, collar, length, shape, and sleeve length, ensuring reliable and clean labels.
@@ -84,7 +92,7 @@ achieves both visually realistic outputs and controlled, fine-grained edits alig
 
 In generator training, the StyleGAN2-Ada model, fine-tuned on the curated Zalando dataset, produces high-fidelity dress
 images that closely resemble real-world samples. Quantitative metrics—such as FID, IS, and LPIPS—validate the quality
-and diversity of the generated images, while visual samples further underscore the model’s ability to capture nuanced
+and diversity of the generated images, while visual samples further underscore the model's ability to capture nuanced
 fashion details.
 
 Inversion experiments reveal that the selected methods, including the encoder-based e4e and hybrid approaches like PTI,
