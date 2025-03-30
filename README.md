@@ -1,8 +1,7 @@
 # Disentangled Visual AttributeManipulation in Fashion: 
 ## Techniques in Generative Deep Neural Networks
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-ThisDressDoesNotExist-blue?style=flat-square&logo=firefox)](https://thisdressdoesnotexist.mgenschow.com)
-
+[![Demo](https://img.shields.io/badge/Demo-ThisDressDoesNotExist-blue)](https://thisdressdoesnotexist.mgenschow.com)
 
 ### Abstract:
 
